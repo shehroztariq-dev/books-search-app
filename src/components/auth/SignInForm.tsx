@@ -1,0 +1,119 @@
+import { useState } from "react";
+import z from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { Button } from "../ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "../ui/field";
+import { Input } from "../ui/input";
+import { toast } from "../ui/toast";
+import { LucideLoaderCircle } from "lucide-react";
+
+export default function SignInForm({
+  setLoginOpen,
+}: {
+  setLoginOpen: (open: boolean) => void;
+}) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const signInSchema = z.object({
+    email: z.email("Invalid email address").min(1, "Email is required"),
+    password: z
+      .string()
+      .min(6, "Password must be at least 6 characters")
+      .max(100, "Password must be less than 100 characters"),
+  });
+
+  type SignInForm = z.infer<typeof signInSchema>;
+  const form = useForm<SignInForm>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (data: SignInForm) => {
+    setIsLoading(true);
+    try {
+      toast.add({
+        type: "success",
+        description: "You are logged in",
+      });
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+      setLoginOpen(false);
+    }
+  };
+
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <FieldGroup className="my-2 gap-2">
+        <Controller
+          control={form.control}
+          name="email"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="gap-1">
+              <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+              <Input
+                {...field}
+                id={field.name}
+                aria-invalid={fieldState.invalid}
+                autoComplete="off"
+              />
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          control={form.control}
+          name="password"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="gap-1">
+              <div className="flex justify-between">
+                <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                <FieldDescription>
+                  <Button variant={"link"} type="button">
+                    Forget Password?
+                  </Button>
+                </FieldDescription>
+              </div>
+              <Input
+                {...field}
+                type="password"
+                id={field.name}
+                aria-invalid={fieldState.invalid}
+                autoComplete="off"
+              />
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="w-full cursor-pointer">
+          {isLoading ? (
+            <>
+              <LucideLoaderCircle className=" animate-spin" />
+              Please wait...
+            </>
+          ) : (
+            "Sign in"
+          )}
+        </Button>
+      </FieldGroup>
+    </form>
+  );
+}

@@ -1,7 +1,8 @@
 // components/header.tsx
 
 import { Link } from "react-router-dom";
-import Search from "./search";
+import Search from "./Search";
+import CTA from "./CTA";
 
 const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
   return (
@@ -24,12 +25,15 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
             </div>
           </Link>
 
-          <div className="flex-1 max-w-full md:max-w-md">
-            <Search
-              className="w-7xl"
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-            />
+          <div className="flex items-center space-x-4">
+            <div className="flex-1 max-w-full md:max-w-md">
+              <Search
+                className="w-7xl"
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+              />
+            </div>
+            <CTA />
           </div>
         </div>
       </div>
